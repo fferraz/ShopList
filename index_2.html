@@ -1,49 +1,56 @@
 <!DOCTYPE html>
 <html lang="en">
-
-<head>
-    <meta charset="UTF-8">
-    <link rel="icon" href="/favicon.ico">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="icon" href="/favicon.ico" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Vue Basics</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/css/bootstrap.min.css" rel="stylesheet"
-        integrity="sha384-4bw+/aepP/YC94hEpVNVgiZdgIC5+VKNBQNGCHeKRQN+PtmoHDEXuppvnDJzQIu9" crossorigin="anonymous">
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+      integrity="sha384-4bw+/aepP/YC94hEpVNVgiZdgIC5+VKNBQNGCHeKRQN+PtmoHDEXuppvnDJzQIu9"
+      crossorigin="anonymous"
+    />
     <script src="https://unpkg.com/vue@3"></script>
-</head>
+  </head>
 
-<body>
-
+  <body>
     <div id="shopping-list">
-        <div class="header">
+      <div class="header">
+        <h1>{{header}}</h1>
+        <button v-if="editing" @click="doEdit(false)" class="btn btn-cancel">
+          Cancel
+        </button>
+        <button v-else @click="doEdit(true)" class="btn btn-primary">
+          Add item
+        </button>
+      </div>
 
-            <h1>{{header}}</h1>
-            <button v-if="editing" @click="doEdit(false)" class="btn btn-cancel"> Cancel</button>
-            <button v-else @click="doEdit(true)" class="btn btn-primary"> Add item</button>
+      <div v-if="editing" class="add-item-form">
+        <input
+          @keyup.enter="saveItem"
+          v-model="newItem"
+          type="text"
+          placeholder="Add an item"
+        />
+        <p class="counter">{{characterCount}}/200</p>
 
-        </div>
+        <label>
+          <input type="checkbox" v-model="newItemHighPriority" /> High Priority
+        </label>
 
+        <button
+          :disabled="newItem.length < 5"
+          @click="saveItem"
+          class="btn btn-primary"
+        >
+          Save Item
+        </button>
+      </div>
 
+      <p v-if="items.length === 0">Nice job! You've bought all your items!</p>
 
-        <div v-if="editing" class="add-item-form">
-
-            <input @keyup.enter="saveItem" v-model="newItem" type="text" placeholder="Add an item" />
-            <p class="counter">{{characterCount}}/200</p>
-
-
-            <label>
-                <input type="checkbox" v-model="newItemHighPriority" /> High Priority
-            </label>
-
-
-            <button :disabled="newItem.length < 5" @click="saveItem" class="btn btn-primary">
-                Save Item
-            </button>
-
-        </div>
-
-        <p v-if="items.length === 0"> Nice job! You've bought all your items!</p>
-
-        <!--
+      <!--
                     <select v-model="newItemPriority">
                     <option value="low"> Low </option>
                     <option value="high"> High </option>
@@ -62,104 +69,95 @@
             <label> <input type="checkbox" v-model="iceCreamFlavors" value="Cookies"> Cookies </label>
                     -->
 
-        <br>
+      <br />
 
-
-
-
-        <ul>
-            <li v-for="item in reverseItems" @click="tooglePurchased(item)" :key="item.id"
-                :class="{strikeout: item.purchased, priority: item.highPriority}" class="static-class"> {{item.label}}
-            </li>
-
-
-
-        </ul>
+      <ul>
+        <li
+          v-for="item in reverseItems"
+          @click="tooglePurchased(item)"
+          :key="item.id"
+          :class="{strikeout: item.purchased, priority: item.highPriority}"
+          class="static-class"
+        >
+          {{item.label}}
+        </li>
+      </ul>
     </div>
 
-    <script>src = "https://unpkg.com/vue@3" ></script>
     <script>
+      src = "https://unpkg.com/vue@3" 
+    </script>
 
-    const shoppingList = Vue.createApp({
+    <script>
+      const shoppingList = Vue.createApp({
         data() {
-            return {
-                header: "Shopping list App",
-                newItem: '',
-                newItemHighPriority: false,
-                editing: false,
+          return {
+            header: "Shopping list App",
+            newItem: "",
+            newItemHighPriority: false,
+            editing: false,
 
-                items: [
-                    { id: 1, label: "10 party hats", purchased: true, highPriority: false },
-                    { id: 2, label: "2 board games", purchased: true, highPriority: false },
-                    { id: 3, label: "20 cups", purchased: false, highPriority: true },
-                ]
-
-            }
+            items: [
+              {
+                id: 1,
+                label: "10 party hats",
+                purchased: true,
+                highPriority: false,
+              },
+              {
+                id: 2,
+                label: "2 board games",
+                purchased: true,
+                highPriority: false,
+              },
+              { id: 3, label: "20 cups", purchased: false, highPriority: true },
+            ],
+          };
         },
         computed: {
+          characterCount() {
+            return this.newItem.length;
+          },
 
-            characterCount() {
-
-                return this.newItem.length
-            },
-
-            reverseItems() {
-
-                return [...this.items].reverse()
-
-            }
+          reverseItems() {
+            return [...this.items].reverse();
+          },
         },
 
         methods: {
-
-            saveItem() {
-
-                if (this.newItem.length > 2) {
-                    this.items.push({
-                        id: this.items.length + 1,
-                        label: this.newItem,
-                        highPriority: this.newItemHighPriority
-                    })
-                    this.newItem = ""
-                    this.newItemHighPriority = ""
-                }
-
-            },
-
-            doEdit(editing) {
-
-                this.editing = editing
-                this.newItem = ""
-                this.newItemHighPriority = ""
-
-            },
-
-            tooglePurchased(item) {
-
-                item.purchased = !item.purchased
-
-
-
+          saveItem() {
+            if (this.newItem.length > 2) {
+              this.items.push({
+                id: this.items.length + 1,
+                label: this.newItem,
+                highPriority: this.newItemHighPriority,
+              });
+              this.newItem = "";
+              this.newItemHighPriority = "";
             }
-        }
+          },
 
+          doEdit(editing) {
+            this.editing = editing;
+            this.newItem = "";
+            this.newItemHighPriority = "";
+          },
 
-
-    })
-
-            .mount('#shopping-list')
-
+          tooglePurchased(item) {
+            item.purchased = !item.purchased;
+          },
+        },
+      }).mount("#shopping-list");
     </script>
 
     <style>
-        .strikeout {
-            text-decoration: line-through;
-        }
+      .strikeout {
+        text-decoration: line-through;
+      }
 
-        .priority {
-            color: rgb(255, 0, 64);
-        }
+      .priority {
+        color: rgb(255, 0, 64);
+      }
     </style>
-</body>
-
+  </body>
 </html>
